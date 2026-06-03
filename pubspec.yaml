@@ -1,6 +1,6 @@
 name: otel_calendly
 description: Dartastic OpenTelemetry bridge for Calendly v2 (event types, scheduled events, invitees, routing forms, webhooks).
-version: 0.1.0-beta.1
+version: 0.1.0-beta.2-wip
 repository: https://github.com/dartastic/otel_calendly
 homepage: https://dartastic.io
 publish_to: https://pub.dartastic.io
