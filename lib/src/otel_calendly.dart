@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_calendly_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_calendly';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class CalendlyResult {
+  /// Creates a result.
   const CalendlyResult({
     this.itemCount,
     this.nextPagePresent,
@@ -51,8 +52,13 @@ class CalendlyResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class CalendlyCallResult<T> {
+  /// Creates a call result.
   const CalendlyCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final CalendlyResult? result;
 }
@@ -85,62 +91,62 @@ Future<T> tracedCalendly<T>({
   final span = _tracer().startSpan(
     'calendly $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.itemCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'calendly.item_count',
           r.result!.itemCount!,
         ));
       }
       if (r.result!.nextPagePresent != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'calendly.pagination.next_page.present',
           r.result!.nextPagePresent!,
         ));
       }
       if (r.result!.eventKind != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'calendly.event.kind',
           r.result!.eventKind!,
         ));
       }
       if (r.result!.status != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'calendly.status',
           r.result!.status!,
         ));
       }
       if (r.result!.cancellationReason != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'calendly.cancellation.reason',
           r.result!.cancellationReason!,
         ));
       }
       if (r.result!.reschedule != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'calendly.invitee.rescheduled',
           r.result!.reschedule!,
         ));
       }
       if (r.result!.tier != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'calendly.tier',
           r.result!.tier!,
         ));
       }
       if (r.result!.requestId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'calendly.request.id',
           r.result!.requestId!,
         ));
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -151,13 +157,13 @@ Future<T> tracedCalendly<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
